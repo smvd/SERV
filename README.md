@@ -1,4 +1,4 @@
-![img](logo.png)
+![img](https://github.com/smvd/SERV/blob/master/Logo.png)
 
 ## Starter guide
 **SERV** is a winsock2 wrapper that can be used to build API's and host websites so lets take a look at how to do that.
@@ -11,7 +11,7 @@ Basic template
 
 int main()
 {
-	CONFIG server = SERV_Setup("127.0.0.1", 80); // First we must setup the server by providing an IP and PORT
+	CONFIG server = SERV_Setup("127.0.0.1", 80); // We configure the server with an IP and PORT
 
 	atexit(SERV_Shutdown); // Then we make shure that the program closes cleanly and doesnt leave any mess behind
 
