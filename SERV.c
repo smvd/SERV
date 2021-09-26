@@ -3,6 +3,7 @@
 
 #include <Winsock.h>
 #include <Stdlib.h>
+#include <Stdio.h>
 
 #define PAGE_NOT_FOUND "HTTP/1.1 404 Not Found\nConnection: close\r\n\r\n"
 #define NO_SWITCHES 0

@@ -27,6 +27,14 @@ int main()
 		{
 			SERV_SendText(client, "Hello World!"); // Send "Hello World!" to the client
 		}
+		else if (SERV_MatchPath(client, "/json")) // We can ofcourse add more pages
+		{
+			SERV_SendJson(client, "{text:\"It even supports JSON\"}"); // Json can also be sent
+		}
+		else if (SERV_MatchPath(client, "/html"))
+		{
+			SERV_SendHTML(client, "<h1>Even HTML</h1>"); // HTML isnt an issue for SERV
+		}
 		else // If they asked for a page we dont have
 		{
 			SERV_SendPageNotFound(client); // Send a 404 page not found to the client
@@ -39,4 +47,11 @@ int main()
 }
 ```
 
-## Documentation
+Now there are a few ways to acces our pages.
+If you have a terminal you can use the CURL command to request the pages.
+```
+curl localhost
+curl localhost/json
+curl localhost/html
+```
+Another way to acces the pages is to simply go to your browser and visit localhost. However our page is not public on the internet yet. That wouuld require port forwarding and requesting a static IP wich is a bit outside of the scope of this basic guide.
