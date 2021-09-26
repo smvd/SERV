@@ -13,7 +13,7 @@ int main()
 {
 	CONFIG server = SERV_Setup("127.0.0.1", 80); // We configure the server with an IP and PORT
 
-	atexit(SERV_Shutdown); // Then we make shure that the program closes cleanly and doesnt leave any mess behind
+	atexit(SERV_Shutdown); // Make shure we clean up before closing the program
 
 	HOST host = SERV_StartServer(server); // Then we start the server
 
