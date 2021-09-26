@@ -1,6 +1,4 @@
-#include <stdio.h>
 #include "SERV.c"
-#include <windows.h>
 
 int main()
 {
