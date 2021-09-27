@@ -6,7 +6,7 @@ int main()
 
 	atexit(SERV_Shutdown);
 
-	HOST host = SERV_StartServer(server);
+	HOST host = SERV_StartServer(server, 1);
 
 	CLIENT client;
 

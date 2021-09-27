@@ -1,0 +1,5 @@
+make.exe build --dry-run --keep-going --print-directory
+make.exe: Entering directory 'q:/SERV'
+gcc main.c -o SERV.exe -W -Wall -Werror -lWS2_32
+make.exe: Leaving directory 'q:/SERV'
+ 
