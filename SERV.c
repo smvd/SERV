@@ -9,6 +9,7 @@
 #define NO_SWITCHES 0
 #define MAX_BUFFER_SIZE 1024
 #define MAX_IP_LENGTH 16
+#define MAX_PARAMETER_COUNT 5
 
 typedef struct sockaddr_in CONFIG;
 typedef SOCKET HOST;
@@ -16,6 +17,9 @@ typedef SOCKET HOST;
 typedef struct
 {
 	int headerLength;
+	int parameterCount;
+	char path[MAX_BUFFER_SIZE];
+	char parameters[MAX_PARAMETER_COUNT][2][MAX_BUFFER_SIZE];
 	char header[MAX_BUFFER_SIZE];
 	char ip[MAX_IP_LENGTH];
 	int port;
@@ -53,6 +57,72 @@ void SERV_Shutdown()
     	exit(1);
     }
     printf("Succes\n");
+}
+
+CLIENT SERV_ParseArguments(CLIENT client)
+{
+	// Split path and arguments ; Split arguments
+	char headerCopy[MAX_BUFFER_SIZE];
+
+	strcpy(headerCopy, client.header);
+
+	char * path = strtok(headerCopy, " ");
+	path = strtok(NULL, " ");
+
+	int pathLenght = strlen(path);
+
+	for (int i = 0; i < pathLenght; i++)
+	{
+		if (path[i] == '?')
+		{
+			path[i] = '\0';
+			pathLenght = i;
+			break;
+		}
+	}
+
+	if (pathLenght > 1 && path[pathLenght -1] == '/')
+	{
+		path[pathLenght -1] = '\0';
+	}
+
+	strcpy(client.path, path);
+
+	strcpy(headerCopy, client.header);
+
+	// Find the first ? and split at the first ' ' after it
+	char * parametersStart = strchr(headerCopy, '?');
+	client.parameterCount = 0;
+
+	if (parametersStart != NULL && parametersStart[1] != '0') // Check if its way out in the header
+	{
+		parametersStart++;
+		parametersStart = strtok(parametersStart, " ");
+
+		// Split at every &
+		char * parameters = strtok(parametersStart, "&");
+
+		int i = 0;
+
+		while (parameters != NULL)
+		{
+			strcpy(client.parameters[i][0], parameters);
+			parameters = strtok(NULL, "&");
+			i++;
+		}
+
+		client.parameterCount = i;
+
+		for (int i = 0; i < client.parameterCount; i++)
+		{
+			parameters = strtok(client.parameters[i][0], "=");
+			strcpy(client.parameters[i][0], parameters);
+			parameters = strtok(NULL, "=");
+			strcpy(client.parameters[i][1], parameters);
+		}
+	}
+
+	return client;
 }
 
 HOST SERV_StartServer(CONFIG server, int maxBacklog)
@@ -149,12 +219,7 @@ CLIENT SERV_CloseConnection(CLIENT client)
 int SERV_MatchPath(CLIENT client, char path[])
 {
 	// Match path with request
-	char * request;
-
-	request = strtok(client.header, " ");
-	request = strtok(NULL, " ");
-
-	if (strcasecmp(request, path) == 0)
+	if (strcasecmp(client.path, path) == 0)
 	{
 		return 1;
 	}
