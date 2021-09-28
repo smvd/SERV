@@ -65,33 +65,23 @@ int main()
 		if (client.headerLength > 0)
 		{
 			client = SERV_ParseArguments(client);
-			// printf("%s : %s\n", client.method, client.path);
 
-			// for (int i = 0; i < client.parameterCount; i++)
-			// {
-			// 	printf("%s : %s\n", client.parameters[i][0], client.parameters[i][1]);
-			// }
-
-			if (SERV_MatchPath(client, "/ID") && client.parameterCount == 2)
+			if 	(
+					SERV_MatchPath(client, "/ID") && 					// localhost/ID
+					client.parameterCount == 2 && 						// 2 arguments
+					strcasecmp(client.parameters[0][0], "ID") == 0 && 	// First argument is ID
+					strcasecmp(client.parameters[1][0], "KEY") == 0		// Second argument is key
+				)
 			{
-				if (strcasecmp(client.parameters[0][0], "ID") == 0 && strcasecmp(client.parameters[1][0], "KEY") == 0)
+				if (strcmp(client.parameters[1][1], GLOBAL_API_KEY) == 0)	// If the key matches the global one (dont do this, add a DB with a list of keys so you can revoke acces)
 				{
-					if (strcmp(client.parameters[1][1], GLOBAL_API_KEY) == 0)
-					{
-						// Return
+					sprintf(buffer, "{ID: %s, PATH: %s}", client.parameters[0][1], client.path);
 
-						sprintf(buffer, "{ID: %s, PATH: %s}", client.parameters[0][0], client.path);
-
-						SERV_SendJson(client, buffer);
-					}
-					else
-					{
-						SERV_SendAccesForbidden(client);
-					}
+					SERV_SendJson(client, buffer);
 				}
 				else
 				{
-					SERV_SendPageNotFound(client);
+					SERV_SendAccesForbidden(client);
 				}
 			}
 			else
