@@ -10,6 +10,7 @@
 #define MAX_BUFFER_SIZE 1024
 #define MAX_IP_LENGTH 16
 #define MAX_PARAMETER_COUNT 5
+#define MAX_METHOD_SIZE 10
 
 typedef struct sockaddr_in CONFIG;
 typedef SOCKET HOST;
@@ -20,6 +21,7 @@ typedef struct
 	int parameterCount;
 	char path[MAX_BUFFER_SIZE];
 	char parameters[MAX_PARAMETER_COUNT][2][MAX_BUFFER_SIZE];
+	char method[MAX_METHOD_SIZE];
 	char header[MAX_BUFFER_SIZE];
 	char ip[MAX_IP_LENGTH];
 	int port;
@@ -61,53 +63,55 @@ void SERV_Shutdown()
 
 CLIENT SERV_ParseArguments(CLIENT client)
 {
-	// Split path and arguments ; Split arguments
-	char headerCopy[MAX_BUFFER_SIZE];
+	// Get the method and store it in client.method
+	// Get the path and store it in client.path
+	// Get the arguments and store them in client.parameters
 
-	strcpy(headerCopy, client.header);
+	char buffer[MAX_BUFFER_SIZE];
 
-	char * path = strtok(headerCopy, " ");
+	strcpy(buffer, client.header);
+
+	char * path = strtok(buffer, " ");
+
+	strcpy(client.method, path);
+
 	path = strtok(NULL, " ");
 
-	int pathLenght = strlen(path);
-
-	for (int i = 0; i < pathLenght; i++)
+	int IncludesParameters = 0;
+	
+	// Take everything before the first ? (if it exists) and store it as the path
+	for (int i = 0; i < (int)strlen(path); i++)
 	{
 		if (path[i] == '?')
 		{
 			path[i] = '\0';
-			pathLenght = i;
+			IncludesParameters = 1;
 			break;
 		}
 	}
-
-	if (pathLenght > 1 && path[pathLenght -1] == '/')
-	{
-		path[pathLenght -1] = '\0';
-	}
-
+	
 	strcpy(client.path, path);
 
-	strcpy(headerCopy, client.header);
-
-	// Find the first ? and split at the first ' ' after it
-	char * parametersStart = strchr(headerCopy, '?');
-	client.parameterCount = 0;
-
-	if (parametersStart != NULL && parametersStart[1] != '0') // Check if its way out in the header
+	// Take everything after the first ? (if it exists), split at at every & sign, split it at every = store it in client.parameters
+	if (IncludesParameters)
 	{
-		parametersStart++;
-		parametersStart = strtok(parametersStart, " ");
+		strcpy(buffer, client.header);
+		path = strtok(buffer, " ");
+		path = strtok(NULL, " ");
 
-		// Split at every &
-		char * parameters = strtok(parametersStart, "&");
+		path = strchr(path, '?');
+		++path;
+
+		strcpy(buffer, path);
+
+		path = strtok(buffer, "&");
 
 		int i = 0;
 
-		while (parameters != NULL)
+		while (path != NULL)
 		{
-			strcpy(client.parameters[i][0], parameters);
-			parameters = strtok(NULL, "&");
+			strcpy(client.parameters[i][0], path);
+			path = strtok(NULL, "&");
 			i++;
 		}
 
@@ -115,11 +119,14 @@ CLIENT SERV_ParseArguments(CLIENT client)
 
 		for (int i = 0; i < client.parameterCount; i++)
 		{
-			parameters = strtok(client.parameters[i][0], "=");
-			strcpy(client.parameters[i][0], parameters);
-			parameters = strtok(NULL, "=");
-			strcpy(client.parameters[i][1], parameters);
+			strcpy(buffer, client.parameters[i][0]);
+			path = strtok(buffer, "=");
+			strcpy(client.parameters[i][0], path);
+			path = strtok(NULL, "=");
+			strcpy(client.parameters[i][1], path);
 		}
+
+		// test=5&test2=10
 	}
 
 	return client;
@@ -271,6 +278,21 @@ void SERV_SendHTML(CLIENT client, char html[])
 void SERV_SendPageNotFound(CLIENT client)
 {
 	SERV_SendRaw(client, PAGE_NOT_FOUND);
+}
+
+void SERV_SendInvalidArguments(CLIENT client)
+{
+	SERV_SendRaw(client, "http/1.1 400 Invalid Arguments\nConnection: close\r\n\r\n");
+}
+
+void SERV_SendAccesForbidden(CLIENT client)
+{
+	SERV_SendRaw(client, "http/1.1 403 Forbidden\nConnection: close\r\n\r\n");
+}
+
+void SERV_SendImATeapot(CLIENT client)
+{
+	SERV_SendRaw(client, "http/1.1 418 I'm A Tea Pot\nConnection: close  \r\n\r\n");
 }
 
 #endif
