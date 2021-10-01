@@ -61,4 +61,4 @@ To install SERV simply go to the release page and download the latest version. T
 [SERVER](#SERVER)
 [HOST](#HOST)
 
-## SERV_Setup()
+# SERV_Setup()
