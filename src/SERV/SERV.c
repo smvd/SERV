@@ -295,9 +295,9 @@ void SERV_SendBadRequest(CLIENT client)
 	SERV_SendRaw(client, "http/1.1 400 Bad Request\nConnection: close\r\n\r\n");
 }
 
-void SERV_SendAccesForbidden(CLIENT client)
+void SERV_SendForbidden(CLIENT client)
 {
-	SERV_SendRaw(client, "http/1.1 403 Forbidden\nConnection: close\nCentent-Length: 15\n\nAcces Forbidden\r\n\r\n");
+	SERV_SendRaw(client, "http/1.1 403 Forbidden\nConnection: close\nCentent-Length: 15\n\nForbidden\r\n\r\n");
 }
 
 void SERV_SendUnauthorized(CLIENT client)
