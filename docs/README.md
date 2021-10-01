@@ -16,7 +16,7 @@ To install SERV simply go to the release page and download the latest version. T
 
 # Documentation
 ## Functions 
-[SERV_Setup()](#SERV_Setup())
+[SERV_Setup()](##SERV_Setup())
 
 [SERV_Shutdown()](#SERV_Shutdown())
 
