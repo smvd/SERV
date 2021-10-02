@@ -1,3 +1,5 @@
-bin/SERV.exe
+bin
 TODO
 workspace.code-workspace
+main.c
+Makefile

@@ -16,9 +16,11 @@
 
 #define BUG printf("BUGBUG\n");
 
-// Deal with winsocks shit variable naming
-typedef struct sockaddr_in SERVER;
-typedef SOCKET HOST;
+typedef struct
+{
+	struct sockaddr_in config;
+	SOCKET listener;
+}SERVER;
 
 typedef struct
 {
@@ -36,15 +38,15 @@ typedef struct
 	SOCKET socket;
 }CLIENT;
 
-SERVER SERV_Setup(char ip[], int port)
+SERVER SERV_StartServer(char ip[], int port, int maxBacklog)
 {
 	// Setup winsock
 	SERVER server;
 	WSADATA wsaData;
 
-	server.sin_family = AF_INET; 					// Its a web socket
-	server.sin_addr.s_addr = inet_addr(ip); 		// Byte order bullshit [big vs little endian]
-	server.sin_port = htons(port); 					// More of that byte order bullshit
+	server.config.sin_family = AF_INET; 					// Its a web socket
+	server.config.sin_addr.s_addr = inet_addr(ip); 		// Byte order bullshit [big vs little endian]
+	server.config.sin_port = htons(port); 					// More of that byte order bullshit
 	
 	printf("Starting winsock...");
 	if (WSAStartup(MAKEWORD(2,2), &wsaData) != 0) 	// Makeword sets the version to 2.2 (the newest)
@@ -54,16 +56,46 @@ SERVER SERV_Setup(char ip[], int port)
 	}
 	printf("Succes\n");
 
+	server.listener = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); // Make a bi-directional, TCP protocol, web socket
+	printf("Making host socket...");
+	if (server.listener == INVALID_SOCKET)
+	{
+		printf("Failed\n");
+		exit(1);
+	}
+	printf("Succes\n");
+
+	printf("Binding host socket...");
+	if (bind(server.listener, (struct sockaddr *)&server.config, sizeof(server.config)) == SOCKET_ERROR) // Link the socket to the given IP and PORT
+	{
+		printf("Failed\n");
+		exit(1);
+	}
+	printf("Succes\n");
+
+	printf("Setting up listener...");
+	if (listen(server.listener, maxBacklog) == SOCKET_ERROR) // Set the socket up to recieve connections
+	{
+		printf("Failed\n");
+		exit(1);
+	}
+	printf("Succes\n");
+
+
 	return server;
 }
 
-void SERV_Shutdown()
+void SERV_ShutdownServer()
 {
 	// Cleanup winsock
 	printf("Shuttingdown winsock...");
     if (WSACleanup() == SOCKET_ERROR)
     {
     	printf("Failed\n");
+		if (WSAGetLastError() == 10091)
+		{
+			printf("This is a knows issue but there is no fix available yet\n");
+		}
     	exit(1);
     }
     printf("Succes\n");
@@ -136,46 +168,14 @@ CLIENT SERV_ParseArguments(CLIENT client)
 	return client;
 }
 
-HOST SERV_StartServer(SERVER server, int maxBacklog)
-{
-	HOST host;
-
-	printf("Making host socket...");
-	host = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); // Make a bi-directional, TCP protocol, web socket
-	if (host == INVALID_SOCKET)
-	{
-		printf("Failed\n");
-		exit(1);
-	}
-	printf("Succes\n");
-
-	printf("Binding host socket...");
-	if (bind(host, (struct sockaddr *)&server, sizeof(server)) == SOCKET_ERROR) // Link the socket to the given IP and PORT
-	{
-		printf("Failed\n");
-		exit(1);
-	}
-	printf("Succes\n");
-
-	printf("Setting up listener...");
-	if (listen(host, maxBacklog) == SOCKET_ERROR) // Set the socket up to recieve connections
-	{
-		printf("Failed\n");
-		exit(1);
-	}
-	printf("Succes\n");
-
-	return host;
-}
-
-CLIENT SERV_Connect(HOST host)
+CLIENT SERV_Connect(SERVER server)
 {
 	CLIENT client;
 	int socketSize = sizeof(struct sockaddr_in); // accept wants a pointer to the int size of the sockaddr_in struct (its another one of the realy fucking bone headed design choises that somehow got into the final product eventhough its such a big fucking pain even some of the docs complain about it)
 	struct sockaddr_in clientInfo;
 
 	printf("\nWaiting for connection...");
-	client.socket = accept(host, (struct sockaddr *)&clientInfo, &socketSize); // It will hang until a client attempts to connect to the server
+	client.socket = accept(server.listener, (struct sockaddr *)&clientInfo, &socketSize); // It will hang until a client attempts to connect to the server
 	if (client.socket == INVALID_SOCKET)
 	{
 		printf("Failed\n");
