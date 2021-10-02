@@ -4,3 +4,4 @@ workspace.code-workspace
 main.c
 Makefile
 .vscode
+SERV.zip
