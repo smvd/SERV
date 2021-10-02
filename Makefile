@@ -5,3 +5,6 @@ build:
 
 run:
 	cd bin; ./SERV.exe
+
+docs:
+	sphinx-build -b html docs/source/ docs/build/html
