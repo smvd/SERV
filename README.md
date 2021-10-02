@@ -9,7 +9,7 @@ Installing SERV is very simple.
 2. Extract the ZIP
 3. Add the SERV folder to your project
 4. Link `WS2_32`
-5. Put `#include "SERV/SERV.h"` at the top of your code
+5. Put `#include "SERV/SERV.h"` at the top of your source file
 
 ## Cookbook
 ### Basic setup:
