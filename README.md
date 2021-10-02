@@ -12,7 +12,7 @@ Installing SERV is very simple.
 5. Put `#include "SERV/SERV.h"` at the top of your code
 
 ## Cookbook
-Basic setup:
+### Basic setup:
 ```c
 #include "SERV/SERV.h" // Add the SERV library
 
@@ -60,7 +60,7 @@ int main()
 }
 ```
 
-Multiple pages:
+### Multiple pages:
 ```c
 int main()
 {
@@ -111,7 +111,7 @@ int main()
 }
 ```
 
-Different file types:
+### Different file types:
 ```c
 #include "SERV/SERV.h" // Add the SERV library
 
@@ -179,7 +179,7 @@ int main()
 }
 ```
 
-Using parameters:
+### Using parameters:
 ```c
 #include "SERV/SERV.h" // Add the SERV library
 
@@ -288,3 +288,10 @@ void SERV_SendImATeapot(CLIENT client); // Build a 418 I'm a tea pot header and 
 ```
 
 ## Roadmap
+For SERV 2.0:
+- Patch out all known bugs
+- Add support for more MIDI types
+- Validate all input to functions
+- Write a custom better version of atoi
+- Replace all dangerous functions with safe ones
+- Remake the logging system
