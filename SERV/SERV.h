@@ -50,7 +50,7 @@
     void SERV_SendJson(CLIENT client, char json[]); // Build the http header for the json and send it to the client
     void SERV_SendHTML(CLIENT client, char html[]); // Build the http header for the html and send it to the client
     void SERV_BuildHeader(char * buffer, int code, char text[]); // Build a http header from the given code and text
-    void SERV_SendError(CLIENT client, int type); // Send a header with an error code of the given type
+    void SERV_SendStatus(CLIENT client, int code); // Send a header with an error code of the given type
     // All official codes on https://en.wikipedia.org/wiki/List_of_HTTP_status_codes are supported
 
     // Logging functions

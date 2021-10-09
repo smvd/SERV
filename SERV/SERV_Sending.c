@@ -98,201 +98,201 @@ void SERV_BuildHeader(char * buffer, int code, char text[])
     sprintf(buffer, "http/1.1 %d %s\nConnection: close\nContent-Length: %d\n\n%s\r\n\r\n", code, text, (int)strlen(text), text);
 }
 
-void SERV_SendError(CLIENT client, int type)
+void SERV_SendStatus(CLIENT client, int code)
 {
     char buffer[MAX_BUFFER_SIZE];
 
     switch (type)
     {
         case 100:
-            SERV_BuildHeader(buffer, type, "Continue");
+            SERV_BuildHeader(buffer, code, "Continue");
             break;
         case 101:
-            SERV_BuildHeader(buffer, type, "Switching Protocols");
+            SERV_BuildHeader(buffer, code, "Switching Protocols");
             break;
         case 102:
-            SERV_BuildHeader(buffer, type, "Processing");
+            SERV_BuildHeader(buffer, code, "Processing");
             break;
         case 103:
-            SERV_BuildHeader(buffer, type, "Early Hints");
+            SERV_BuildHeader(buffer, code, "Early Hints");
             break;
 
         case 200:
-            SERV_BuildHeader(buffer, type, "Ok");
+            SERV_BuildHeader(buffer, code, "Ok");
             break;
         case 201:
-            SERV_BuildHeader(buffer, type, "Created");
+            SERV_BuildHeader(buffer, code, "Created");
             break;
         case 202:
-            SERV_BuildHeader(buffer, type, "Accepted");
+            SERV_BuildHeader(buffer, code, "Accepted");
             break;
         case 203:
-            SERV_BuildHeader(buffer, type, "Non-Authoritative Information");
+            SERV_BuildHeader(buffer, code, "Non-Authoritative Information");
             break;
         case 204:
-            SERV_BuildHeader(buffer, type, "No Content");
+            SERV_BuildHeader(buffer, code, "No Content");
             break;
         case 205:
-            SERV_BuildHeader(buffer, type, "Reset Content");
+            SERV_BuildHeader(buffer, code, "Reset Content");
             break;
         case 206:
-            SERV_BuildHeader(buffer, type, "Partial Content");
+            SERV_BuildHeader(buffer, code, "Partial Content");
             break;
         case 207:
-            SERV_BuildHeader(buffer, type, "Multi-Status");
+            SERV_BuildHeader(buffer, code, "Multi-Status");
             break;
         case 208:
-            SERV_BuildHeader(buffer, type, "Already Reported");
+            SERV_BuildHeader(buffer, code, "Already Reported");
             break;
         case 226:
-            SERV_BuildHeader(buffer, type, "IM Used");
+            SERV_BuildHeader(buffer, code, "IM Used");
             break;
 
         case 300:
-            SERV_BuildHeader(buffer, type, "Multiple Choices");
+            SERV_BuildHeader(buffer, code, "Multiple Choices");
             break;
         case 301:
-            SERV_BuildHeader(buffer, type, "Moved Permanently");
+            SERV_BuildHeader(buffer, code, "Moved Permanently");
             break;
         case 302:
-            SERV_BuildHeader(buffer, type, "Found");
+            SERV_BuildHeader(buffer, code, "Found");
             break;
         case 303:
-            SERV_BuildHeader(buffer, type, "See Other");
+            SERV_BuildHeader(buffer, code, "See Other");
             break;
         case 304:
-            SERV_BuildHeader(buffer, type, "Not Modified");
+            SERV_BuildHeader(buffer, code, "Not Modified");
             break;
         case 305:
-            SERV_BuildHeader(buffer, type, "Use Proxy");
+            SERV_BuildHeader(buffer, code, "Use Proxy");
             break;
         case 306:
-            SERV_BuildHeader(buffer, type, "Switch Proxy");
+            SERV_BuildHeader(buffer, code, "Switch Proxy");
             break;
         case 307:
-            SERV_BuildHeader(buffer, type, "Temporary Redirect");
+            SERV_BuildHeader(buffer, code, "Temporary Redirect");
             break;
         case 308:
-            SERV_BuildHeader(buffer, type, "Permanent Redirect");
+            SERV_BuildHeader(buffer, code, "Permanent Redirect");
             break;
 
         case 400:
-            SERV_BuildHeader(buffer, type, "Bad Request");
+            SERV_BuildHeader(buffer, code, "Bad Request");
             break;
         case 401:
-            SERV_BuildHeader(buffer, type, "Unauthorized");
+            SERV_BuildHeader(buffer, code, "Unauthorized");
             break;
         case 402:
-            SERV_BuildHeader(buffer, type, "Payment Required");
+            SERV_BuildHeader(buffer, code, "Payment Required");
             break;
         case 403:
-            SERV_BuildHeader(buffer, type, "Forbidden");
+            SERV_BuildHeader(buffer, code, "Forbidden");
             break;
         case 404:
-            SERV_BuildHeader(buffer, type, "Not Found");
+            SERV_BuildHeader(buffer, code, "Not Found");
             break;
         case 405:
-            SERV_BuildHeader(buffer, type, "Method Not Allowed");
+            SERV_BuildHeader(buffer, code, "Method Not Allowed");
             break;
         case 406:
-            SERV_BuildHeader(buffer, type, "Not Acceptable");
+            SERV_BuildHeader(buffer, code, "Not Acceptable");
             break;
         case 407:
-            SERV_BuildHeader(buffer, type, "Proxy Authentication Required");
+            SERV_BuildHeader(buffer, code, "Proxy Authentication Required");
             break;
         case 408:
-            SERV_BuildHeader(buffer, type, "Request Timeout");
+            SERV_BuildHeader(buffer, code, "Request Timeout");
             break;
         case 409:
-            SERV_BuildHeader(buffer, type, "Conflict");
+            SERV_BuildHeader(buffer, code, "Conflict");
             break;
         case 410:
-            SERV_BuildHeader(buffer, type, "Gone");
+            SERV_BuildHeader(buffer, code, "Gone");
             break;
         case 411:
-            SERV_BuildHeader(buffer, type, "Length Required");
+            SERV_BuildHeader(buffer, code, "Length Required");
             break;
         case 412:
-            SERV_BuildHeader(buffer, type, "Precondition Failed");
+            SERV_BuildHeader(buffer, code, "Precondition Failed");
             break;
         case 413:
-            SERV_BuildHeader(buffer, type, "Payload Too Large");
+            SERV_BuildHeader(buffer, code, "Payload Too Large");
             break;
         case 414:
-            SERV_BuildHeader(buffer, type, "Uri Too Long");
+            SERV_BuildHeader(buffer, code, "Uri Too Long");
             break;
         case 415:
-            SERV_BuildHeader(buffer, type, "Unsupported Media Type");
+            SERV_BuildHeader(buffer, code, "Unsupported Media Type");
             break;
         case 416:
-            SERV_BuildHeader(buffer, type, "Range Not Satisfiable");
+            SERV_BuildHeader(buffer, code, "Range Not Satisfiable");
             break;
         case 417:
-            SERV_BuildHeader(buffer, type, "Exception Failed");
+            SERV_BuildHeader(buffer, code, "Exception Failed");
             break;
         case 421:
-            SERV_BuildHeader(buffer, type, "Misdirected Request");
+            SERV_BuildHeader(buffer, code, "Misdirected Request");
             break;
         case 422:
-            SERV_BuildHeader(buffer, type, "Unprocessable Entity");
+            SERV_BuildHeader(buffer, code, "Unprocessable Entity");
             break;
         case 423:
-            SERV_BuildHeader(buffer, type, "Locked");
+            SERV_BuildHeader(buffer, code, "Locked");
             break;
         case 424:
-            SERV_BuildHeader(buffer, type, "Failed Dependency");
+            SERV_BuildHeader(buffer, code, "Failed Dependency");
             break;
         case 425:
-            SERV_BuildHeader(buffer, type, "Too Early");
+            SERV_BuildHeader(buffer, code, "Too Early");
             break;
         case 426:
-            SERV_BuildHeader(buffer, type, "Upgrade Required");
+            SERV_BuildHeader(buffer, code, "Upgrade Required");
             break;
         case 428:
-            SERV_BuildHeader(buffer, type, "Precondition Required");
+            SERV_BuildHeader(buffer, code, "Precondition Required");
             break;
         case 429:
-            SERV_BuildHeader(buffer, type, "Too Many Requests");
+            SERV_BuildHeader(buffer, code, "Too Many Requests");
             break;
         case 431:
-            SERV_BuildHeader(buffer, type, "Request Header Field Too Large");
+            SERV_BuildHeader(buffer, code, "Request Header Field Too Large");
             break;
         case 451:
-            SERV_BuildHeader(buffer, type, "Unavailable For Legal Reasons");
+            SERV_BuildHeader(buffer, code, "Unavailable For Legal Reasons");
             break;
 
         case 500:
-            SERV_BuildHeader(buffer, type, "Internal Server Error");
+            SERV_BuildHeader(buffer, code, "Internal Server Error");
             break;
         case 501:
-            SERV_BuildHeader(buffer, type, "Not Implemented");
+            SERV_BuildHeader(buffer, code, "Not Implemented");
             break;
         case 502:
-            SERV_BuildHeader(buffer, type, "Bad Gateway");
+            SERV_BuildHeader(buffer, code, "Bad Gateway");
             break;
         case 503:
-            SERV_BuildHeader(buffer, type, "Service Unavailable");
+            SERV_BuildHeader(buffer, code, "Service Unavailable");
             break;
         case 504:
-            SERV_BuildHeader(buffer, type, "Gateway Timeout");
+            SERV_BuildHeader(buffer, code, "Gateway Timeout");
             break;
         case 505:
-            SERV_BuildHeader(buffer, type, "HTTP Version Not Supported");
+            SERV_BuildHeader(buffer, code, "HTTP Version Not Supported");
             break;
         case 506:
-            SERV_BuildHeader(buffer, type, "Variant Also Negotiates");
+            SERV_BuildHeader(buffer, code, "Variant Also Negotiates");
             break;
         case 507:
-            SERV_BuildHeader(buffer, type, "Insufficient Storage");
+            SERV_BuildHeader(buffer, code, "Insufficient Storage");
             break;
         case 508:
-            SERV_BuildHeader(buffer, type, "Loop Detected");
+            SERV_BuildHeader(buffer, code, "Loop Detected");
             break;
         case 510:
-            SERV_BuildHeader(buffer, type, "Not Extended");
+            SERV_BuildHeader(buffer, code, "Not Extended");
             break; 
         case 511:
-            SERV_BuildHeader(buffer, type, "Network Authentication Required");
+            SERV_BuildHeader(buffer, code, "Network Authentication Required");
             break;
     }
 
