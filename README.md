@@ -259,10 +259,10 @@ int main()
 ```c
 // Core functions
 void SERV_ShutdownServer(); // Shuts down winsock2 and exits
-HOST SERV_StartServer(char ip[], int port, int maxBacklog); // Setup the listener for the server
+SERVER SERV_StartServer(char ip[], int port, int maxBacklog); // Setup the listener for the server
 
 // Connection functions
-CLIENT SERV_Connect(HOST host); // Wait for a client connection and recieve its header
+CLIENT SERV_Connect(SERVER host); // Wait for a client connection and recieve its header
 CLIENT SERV_CloseConnection(CLIENT client); // Stop the client from sending data and clear the socket
 
 // Argument functions
@@ -277,14 +277,12 @@ void SERV_SendRaw(CLIENT client, char data[]); // Send the raw data to the clien
 void SERV_SendText(CLIENT client, char text[]); // Build the http header for the text and send it to the client
 void SERV_SendJson(CLIENT client, char json[]); // Build the http header for the json and send it to the client
 void SERV_SendHTML(CLIENT client, char html[]); // Build the http header for the html and send it to the client
+void SERV_BuildHeader(char * buffer, int code, char text[]); // Build a http header from the given code and text
+void SERV_SendError(CLIENT client, int type); // Send a header with an error code of the given type
+// All official codes on https://en.wikipedia.org/wiki/List_of_HTTP_status_codes are supported
 
-// Error functions
-void SERV_SendPageNotFound(CLIENT client); // Build a 404 page not found header and send it to the client
-void SERV_SendInvalidArguments(CLIENT client); // Build a 400 invalid arguments header and send it to the client
-void SERV_SendBadRequest(CLIENT client); // Build a 400 bad request header and send it to the client
-void SERV_SendForbidden(CLIENT client); // Build a 403 forbidden header and send it to the client
-void SERV_SendUnauthorized(CLIENT client); // Build a 401 unauthorized header and send it to the client
-void SERV_SendImATeapot(CLIENT client); // Build a 418 I'm a tea pot header and send it to the client
+// Logging functions
+void SERV_Log(char * message, int type); // Log a message of the given type
 ```
 
 ## Roadmap
