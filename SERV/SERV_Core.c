@@ -33,6 +33,8 @@ SERVER SERV_StartServer(char ip[], int port, int maxBacklog)
 		exit(1);
 	}
 
+	printf("=================================================================\n\n");
+
 	return server;
 }
 

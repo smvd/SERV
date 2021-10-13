@@ -20,7 +20,7 @@ CLIENT SERV_Connect(SERVER server)
 	}
 	else if (client.headerLength == 0)
 	{
-		printf(COLOR_YELLOW "                         Connection closed\n" COLOR_WHITE);
+		printf(COLOR_ERROR "                         Connection closed\n" COLOR_RESET);
 	}
 
 	strcpy(client.ip, inet_ntoa(clientInfo.sin_addr)); 	// Convert back from that byte order bullshit

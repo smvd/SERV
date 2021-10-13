@@ -1,20 +1,18 @@
 void SERV_Log(char * message, int type)
 {
-    (void)(message);
-
     switch (type)
     {
         case LOGGING_ERROR:
-            printf(COLOR_RED "   (ERROR)    " COLOR_WHITE);
+            printf(COLOR_ERROR "   (ERROR)    " COLOR_RESET);
             break;
         case LOGGING_SETUP:
-            printf(COLOR_GREEN "   (SETUP)    " COLOR_WHITE);
+            printf(COLOR_SETUP "   (SETUP)    " COLOR_RESET);
             break;
         case LOGGING_CONNECTION:
-            printf(COLOR_BLUE " (CONNECTION) " COLOR_WHITE);
+            printf(COLOR_CONNECTION " (CONNECTION) " COLOR_RESET);
             break;
         case LOGGING_SENDING:
-            printf(COLOR_PURPLE "  (SENDING)   " COLOR_WHITE);
+            printf(COLOR_SENDING "  (SENDING)   " COLOR_RESET);
             break;
     }
 
@@ -26,5 +24,5 @@ void SERV_Log(char * message, int type)
     strftime(buffer, MAX_BUFFER_SIZE, "%H:%M:%S", info);
     printf("[%s] ", buffer);
 
-    printf(COLOR_YELLOW "%s\n" COLOR_WHITE, message);
+    printf(COLOR_MESSAGE "%s\n" COLOR_RESET, message);
 }

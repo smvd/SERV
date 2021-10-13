@@ -1,3 +1,70 @@
+int SERV_HexToInt(char c)
+{
+	int out;
+
+	switch (c)
+	{
+		case '0':
+			out = 0;
+			break;
+		case '1':
+			out = 1;
+			break;
+		case '2':
+			out = 2;
+			break;
+		case '3':
+			out = 3;
+			break;
+		case '4':
+			out = 4;
+			break;
+		case '5':
+			out = 5;
+			break;
+		case '6':
+			out = 6;
+			break;
+		case '7':
+			out = 7;
+			break;
+		case '8':
+			out = 8;
+			break;
+		case '9':
+			out = 9;
+			break;
+		case 'a':
+		case 'A':
+			out = 10;
+			break;
+		case 'b':
+		case 'B':
+			out = 11;
+			break;
+		case 'c':
+		case 'C':
+			out = 12;
+			break;
+		case 'd':
+		case 'D':
+			out = 13;
+			break;
+		case 'e':
+		case 'E':
+			out = 14;
+			break;
+		case 'f':
+		case 'F':
+			out = 15;
+			break;
+		default:
+			out = -1;
+	}
+
+	return out;
+}
+
 CLIENT SERV_ParseArguments(CLIENT client)
 {
 	char buffer[MAX_BUFFER_SIZE];
@@ -59,6 +126,31 @@ CLIENT SERV_ParseArguments(CLIENT client)
 
 			path = strtok(NULL, "=");
 			strcpy(client.parameters[i][1], path);
+
+			int length = strlen(client.parameters[i][1]);
+
+			// Loop over each parameter and remove the escape characters
+			for (int a = 0; a < length; a++)
+			{
+				if (client.parameters[i][1][a] == '%')
+				{
+					int converted = 0;
+					char total = 0;
+
+					// Convert the escape characters into a single character
+					converted = SERV_HexToInt(client.parameters[i][1][a +1]);
+					(converted != -1) ? (total += converted * 16) : (0);
+					converted = SERV_HexToInt(client.parameters[i][1][a +2]);
+					(converted != -1) ? (total += converted) : (0);
+
+					length -= 2;
+
+					// Replace the escape character
+					client.parameters[i][1][a +2] = total;
+					memmove(&client.parameters[i][1][a], &client.parameters[i][1][a +2], length - a);
+					client.parameters[i][1][length] = '\0';
+				}
+			}
 		}
 	}
 

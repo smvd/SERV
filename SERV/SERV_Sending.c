@@ -1,96 +1,14 @@
 void SERV_SendRaw(CLIENT client, char data[])
 {
 	char buffer[MAX_BUFFER_SIZE * 2];
-	sprintf(buffer, "Sending %s to %s:%d", client.path, client.ip, client.port);
+    
+	sprintf(buffer, "Sending to %s:%d", client.ip, client.port);
 	SERV_Log(buffer, LOGGING_SENDING);
+
 	if (send(client.socket, data, strlen(data), NO_SWITCHES) == SOCKET_ERROR) // Send the client the raw bytes
 	{
 		exit(1);
 	}
-}
-
-void SERV_SendText(CLIENT client, char text[])
-{
-	// Send text to client
-	char buffer[MAX_BUFFER_SIZE];
-
-	sprintf(buffer, "HTTP/1.1 200 OK\nConnection: close\nContent-Type: text\nContent-Length: %d\n\n%s\r\n\r\n", (int)strlen(text), text);
-
-	SERV_SendRaw(client, buffer);
-}
-
-void SERV_SendJson(CLIENT client, char json[])
-{
-	// Send json to client
-	char buffer[MAX_BUFFER_SIZE];
-
-	sprintf(buffer, "HTTP/1.1 200 OK\nConnection: close\nContent-Type: text/json\nContent-Length: %d\n\n%s\r\n\r\n", (int)strlen(json), json);
-
-	SERV_SendRaw(client, buffer);
-}
-
-void SERV_SendHTML(CLIENT client, char html[])
-{
-	// Send html to client
-	char buffer[MAX_BUFFER_SIZE];
-
-	sprintf(buffer, "HTTP/1.1 200 OK\nConnection: close\nContent-Type: text/html\nContent-Length: %d\n\n%s\r\n\r\n", (int)strlen(html), html);
-
-	SERV_SendRaw(client, buffer);
-}
-
-void SERV_SendImage(CLIENT client, char type[], char path[])
-{
-	FILE * fp = fopen(path, "rb"); 	// Get a handle to the given file
-
-	if (fp == NULL)
-	{
-		SERV_SendError(client, 500);
-		return;
-	}
-
-	fseek(fp, 0, SEEK_END);			// Jump to the end of the file
-	int size = ftell(fp);			// Check how many bytes me are from 0
-	fseek(fp, 0, SEEK_SET);			// Jump to the start of the file
-
-	char * buffer = (char *)malloc(size * sizeof(char)); // Make a buffer the size of the image
-
-	sprintf(buffer, "http/1.1 200 Ok\nConnection: close\nContent-Type: image/%s\nContent-Length %d\r\n\r\n", type, size); // Build the header
-
-	SERV_SendRaw(client, buffer); 	// Send it to the client
-
-	fread(buffer, size, 1, fp); // Read the image into the buffer
-	fclose(fp); 				// Close the image file
-
-	send(client.socket, buffer, size, NO_SWITCHES); // Send the image to the client
-}
-
-void SERV_SendMP4(CLIENT client, char path[])
-{
-	// Like in send image we open and find the size of the file
-	FILE * fp = fopen(path, "rb");
-
-	if (fp == NULL)
-	{
-		SERV_SendError(client, 500);
-		return;
-	}
-
-	fseek(fp, 0, SEEK_END);
-	int size = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
-
-	char * buffer = (char *)malloc(size * sizeof(char)); // Claim space for the buffer to store the video
-
-	sprintf(buffer, "http/1.1 200 Ok\nConnection: close\nContent-Type: video/mp4\nContent-Length %d\r\n\r\n", size); // Build the header
-
-	SERV_SendRaw(client, buffer);	// Send the header to the client
-
-	// Read the file into the buffer and close the file
-	fread(buffer, size, 1, fp);
-	fclose(fp);
-
-	SERV_SendRaw(client, buffer);	// Send the video to the client
 }
 
 void SERV_BuildHeader(char * buffer, int code, char text[])
@@ -102,7 +20,7 @@ void SERV_SendStatus(CLIENT client, int code)
 {
     char buffer[MAX_BUFFER_SIZE];
 
-    switch (type)
+    switch (code)
     {
         case 100:
             SERV_BuildHeader(buffer, code, "Continue");
@@ -297,4 +215,192 @@ void SERV_SendStatus(CLIENT client, int code)
     }
 
     SERV_SendRaw(client, buffer);
+}
+
+void SERV_SendData(CLIENT client, int type, char data[], int isFile)
+{
+    char buffer[MAX_BUFFER_SIZE] = "http/1.1 200 Ok\nConnection: Close\nContent-Type: ";
+
+    switch (type)
+    {
+        case TYPE_TEXT:
+            strcat(buffer, "text/plain");
+            break;
+        case TYPE_PHP:
+            strcat(buffer, "application/x-httpd-php");
+            break;
+        case TYPE_JAVASCRIPT:
+            strcat(buffer, "text/javascript");
+            break;
+        case TYPE_CSS:
+            strcat(buffer, "text/css");
+            break;
+        case TYPE_BIN:
+            strcat(buffer, "application/octet-stream");
+            break;
+
+        case TYPE_HTML:
+            strcat(buffer, "text/html");
+            break;
+        case TYPE_RTF:
+            strcat(buffer, "application/rtf");
+            break;
+        case TYPE_PDF:
+            strcat(buffer, "application/pdf");
+            break;
+        case TYPE_ODT:
+            strcat(buffer, "application/vnd.oasis.opendocument.text");
+            break;
+        case TYPE_DOC:
+            strcat(buffer, "application/msword");
+            break;
+
+        case TYPE_XLS:
+            strcat(buffer, "application/vnd.ms-excel");
+            break;
+        case TYPE_ODS:
+            strcat(buffer, "application/vnd.oasis.opendocument.spreadsheet");
+            break;
+        case TYPE_CSV:
+            strcat(buffer, "text/csv");
+            break;
+
+        case TYPE_OTF:
+            strcat(buffer, "font/otf");
+            break;
+        case TYPE_TTF:
+            strcat(buffer, "font/ttf");
+            break;
+
+        case TYPE_JSON:
+            strcat(buffer, "application/json");
+            break;
+        case TYPE_XML:
+            strcat(buffer, "application/xml");
+            break;
+
+        case TYPE_ZIP:
+            strcat(buffer, "application/zip");
+            break;
+        case TYPE_7ZIP:
+            strcat(buffer, "application/x-7z-compressed");
+            break;
+        case TYPE_TAR:
+            strcat(buffer, "application/x-tar");
+            break;
+        case TYPE_RAR:
+            strcat(buffer, "application/vnd.rar");
+            break;
+        case TYPE_GZIP:
+            strcat(buffer, "application/gzip");
+            break;
+        case TYPE_BZIP:
+            strcat(buffer, "application/x-bzip");
+            break;
+        case TYPE_BZIP2:
+            strcat(buffer, "application/x-bzip2");
+            break;
+        
+        case TYPE_WEBP:
+            strcat(buffer, "image/webp");
+            break;
+        case TYPE_TIFF:
+            strcat(buffer, "image/tiff");
+            break;
+        case TYPE_SVG:
+            strcat(buffer, "image/svg+xml");
+            break;
+        case TYPE_PNG:
+            strcat(buffer, "image/png");
+            break;
+        case TYPE_JPEG:
+            strcat(buffer, "image/jpeg");
+            break;
+        case TYPE_ICON:
+            strcat(buffer, "image/vnd.microsoft.icon");
+            break;
+        case TYPE_GIF:
+            strcat(buffer, "image/gif");
+            break;
+        case TYPE_BMP:
+            strcat(buffer, "image/bmp");
+            break;
+
+        case TYPE_WEBM:
+            strcat(buffer, "video/webm");
+            break;
+        case TYPE_MPEG:
+            strcat(buffer, "video/mpeg");
+            break;
+        case TYPE_MP4:
+            strcat(buffer, "video/mp4");
+            break;
+
+        case TYPE_WEBA:
+            strcat(buffer, "audio/webm");
+            break;
+        case TYPE_WAV:
+            strcat(buffer, "audio/wav");
+            break;
+        case TYPE_OPUS:
+            strcat(buffer, "audio/opus");
+            break;
+        case TYPE_MP3:
+            strcat(buffer, "audio/mpeg");
+            break;
+        case TYPE_MIDI:
+            strcat(buffer, "audio/midi");
+            break;
+    }
+
+    int length;
+
+    if (isFile) // Content length mismatch altho it looks good
+    {
+        FILE * fp = fopen(data, "rb");
+        if (fp == NULL)
+        {
+            SERV_SendStatus(client, 500);
+            return;
+        }
+
+        fseek(fp, 0, SEEK_END);
+        length = ftell(fp);
+        fseek(fp, 0, SEEK_SET);
+	    fclose(fp);
+    }
+    else
+    {
+        length = strlen(data);
+    }
+
+    char temp[MAX_BUFFER_SIZE];
+    sprintf(temp, "\nContent-Length: %d\n\n", length);
+    strcat(buffer, temp);
+
+    SERV_SendRaw(client, buffer);
+
+    if (isFile)
+    {
+        int ret;
+        FILE * fp = fopen(data, "rb");
+
+        while (1)
+        {
+            ret = fread(buffer, 1, MAX_BUFFER_SIZE, fp);
+
+            send(client.socket, buffer, ret, NO_SWITCHES);
+
+            if (ret < MAX_BUFFER_SIZE)
+            {
+                break;
+            }
+        }
+    }
+    else
+    {
+        send(client.socket, data, length, NO_SWITCHES);
+    }
+
+    send(client.socket, "\r\n\r\n", 4, NO_SWITCHES);
 }
