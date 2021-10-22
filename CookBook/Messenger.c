@@ -28,16 +28,22 @@ int main()
                     if (index != -1)
                     {
                         FILE * fp = fopen("MessengerStorage.txt", "w");
+                        if (fp == NULL)
+                        {
+                            SERV_SendStatus(client, 500); // Serverside error
+                        }
+                        else
+                        {
+                            fputs(client.parameters[index][1], fp);
 
-                        fputs(client.parameters[index][1], fp);
+                            fclose(fp);
 
-                        fclose(fp);
-
-                        SERV_SendStatus(client, 201);
+                            SERV_SendStatus(client, 201); // Created
+                        }
                     }
                     else
                     {
-                        SERV_SendStatus(client, 400);
+                        SERV_SendStatus(client, 400); // Bad request
                     }
                 }
                 else if (SERV_MatchPath(client, "/message"))
@@ -46,17 +52,17 @@ int main()
                 }
                 else
                 {
-                    SERV_SendStatus(client, 404);
+                    SERV_SendStatus(client, 404); // Not found
                 }
             }
             else
             {
-                SERV_SendStatus(client, 501); // 501 Not Implemented
+                SERV_SendStatus(client, 405); // Method not allowed
             }
 		}
 		else
 		{
-			SERV_SendStatus(client, 408);
+			SERV_SendStatus(client, 408); // Connection time out
 		}
 
 		client = SERV_CloseConnection(client);

@@ -2,6 +2,8 @@
 `SERV_SendStatus()` is declared in `SERV_Sending.c` and is used for sending a basic header to the client.
 It logs the clients IP and PORT and will exit when it fails.
 
+**These dont yet have the official protocol headers setup, while this should be an issue be aware that some are not in compliance with the http protocol.**
+
 | name | type | use |
 |------|------|-----|
 | client | CLIENT | Holds a reference to the clients connection |
