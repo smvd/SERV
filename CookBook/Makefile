@@ -18,5 +18,9 @@ Messenger:
 	gcc $@.c -o $@.exe -lWS2_32
 	./$@.exe
 
+GenerateKeys.c:
+	gcc $@.c -o $@.exe -lWS2_32
+	./$@.exe
+
 clean:
 	rm *.exe
